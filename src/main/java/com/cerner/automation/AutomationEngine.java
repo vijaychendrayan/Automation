@@ -129,35 +129,38 @@ class ProcessQueue implements Runnable {
             //Get Screenshot file path
             engine.setScreenShotPath(screenShotFilePath);
             Sheet sheet = excelWorkbook.getSheetAt(0);
-            Sheet funcSheet = excelWorkbook.getSheet("Functions");
-            //Load function in memory 17-Feb-2018 Start
-            System.out.println("-----Loading functions----");
-            funcRowIterator = funcSheet.iterator();
-            int funcCount = 0;
-            int funcRowCount = 0;
-            String currentFuncName = null;
-            String preFuncName = null;
-            while (funcRowIterator.hasNext()){
-                //Skip Header Row
-                ProcessData funcDataNew = new ProcessData(funcRowIterator.next());
-                if(funcRowCount == 0){
+            try {
+                Sheet funcSheet = excelWorkbook.getSheet("Functions");
+                //Load function in memory 17-Feb-2018 Start
+                System.out.println("-----Loading functions----");
+                funcRowIterator = funcSheet.iterator();
+                int funcCount = 0;
+                int funcRowCount = 0;
+                String currentFuncName = null;
+                String preFuncName = null;
+                while (funcRowIterator.hasNext()) {
+                    //Skip Header Row
+                    ProcessData funcDataNew = new ProcessData(funcRowIterator.next());
+                    if (funcRowCount == 0) {
+                        funcRowCount += 1;
+                        //System.out.println("Skipping Header row");
+                        continue;
+                    }
+                    funcDataList.add(funcDataNew);
+                    currentFuncName = funcDataNew.testCaseDescr;
+                    //System.out.println("Prev Function : "+preFuncName+" Current Function : "+currentFuncName);
+                    if (!currentFuncName.equals(preFuncName)) {
+                        funcCount += 1;
+                    }
+                    preFuncName = currentFuncName;
                     funcRowCount += 1;
-                    //System.out.println("Skipping Header row");
-                    continue;
                 }
-                funcDataList.add(funcDataNew);
-                currentFuncName = funcDataNew.testCaseDescr;
-                //System.out.println("Prev Function : "+preFuncName+" Current Function : "+currentFuncName);
-                if(!currentFuncName.equals(preFuncName)){
-                    funcCount += 1;
-                }
-                preFuncName = currentFuncName;
-                funcRowCount += 1;
+                System.out.println(funcCount + " Function(s) Loaded successfully");
+                //Load function in memory 17-Feb-2018 End
+                //excelWorkbook.getSheet(s)
+            }catch (Exception e){
+                System.out.println("No Functions to load");
             }
-            System.out.println(funcCount+ " Function(s) Loaded successfully");
-            //Load function in memory 17-Feb-2018 End
-            //excelWorkbook.getSheet(s)
-
             rowIterator = sheet.iterator();
             int i = 0;
             while (rowIterator.hasNext()){
